@@ -1,4 +1,4 @@
-﻿#%% Importing Modules
+# %% Importing Modules
 import os
 
 import matplotlib.pyplot as plt
@@ -9,18 +9,18 @@ from matplotlib.colors import Normalize
 from scipy.stats import levy_stable, linregress
 from scipy.stats import norm as scipy_norm
 
-#%% Tokyo Night Storm Theme
+# %% Tokyo Night Storm Theme
 PALETTE = {
-    "bg":     "#1a1b26",
-    "panel":  "#24283b",
-    "fg":     "#c0caf5",
-    "muted":  "#a9b1d6",
+    "bg": "#1a1b26",
+    "panel": "#24283b",
+    "fg": "#c0caf5",
+    "muted": "#a9b1d6",
     "subtle": "#565f89",
-    "blue":   "#7aa2f7",
-    "cyan":   "#7dcfff",
+    "blue": "#7aa2f7",
+    "cyan": "#7dcfff",
     "purple": "#bb9af7",
-    "red":    "#f7768e",
-    "green":  "#9ece6a",
+    "red": "#f7768e",
+    "green": "#9ece6a",
     "yellow": "#e0af68",
     "orange": "#ff9e64",
 }
@@ -30,29 +30,33 @@ CYCLE = [PALETTE[k] for k in ("blue", "cyan", "purple", "red", "green", "yellow"
 def applyTokyoNight():
     """Apply Tokyo Night Storm dark theme to all subsequent matplotlib figures."""
     import matplotlib as mpl
-    mpl.rcParams.update({
-        "figure.facecolor":  PALETTE["bg"],
-        "axes.facecolor":    PALETTE["bg"],
-        "savefig.facecolor": PALETTE["bg"],
-        "axes.edgecolor":    PALETTE["subtle"],
-        "axes.labelcolor":   PALETTE["fg"],
-        "axes.titlecolor":   PALETTE["fg"],
-        "xtick.color":       PALETTE["muted"],
-        "ytick.color":       PALETTE["muted"],
-        "text.color":        PALETTE["fg"],
-        "grid.color":        PALETTE["subtle"],
-        "grid.linestyle":    "--",
-        "grid.alpha":        0.4,
-        "axes.prop_cycle":   cycler(color=CYCLE),
-        "legend.facecolor":  PALETTE["panel"],
-        "legend.edgecolor":  PALETTE["subtle"],
-        "legend.labelcolor": PALETTE["fg"],
-        "font.family":       "sans-serif",
-        "font.size":         10,
-    })
+
+    mpl.rcParams.update(
+        {
+            "figure.facecolor": PALETTE["bg"],
+            "axes.facecolor": PALETTE["bg"],
+            "savefig.facecolor": PALETTE["bg"],
+            "axes.edgecolor": PALETTE["subtle"],
+            "axes.labelcolor": PALETTE["fg"],
+            "axes.titlecolor": PALETTE["fg"],
+            "xtick.color": PALETTE["muted"],
+            "ytick.color": PALETTE["muted"],
+            "text.color": PALETTE["fg"],
+            "grid.color": PALETTE["subtle"],
+            "grid.linestyle": "--",
+            "grid.alpha": 0.4,
+            "axes.prop_cycle": cycler(color=CYCLE),
+            "legend.facecolor": PALETTE["panel"],
+            "legend.edgecolor": PALETTE["subtle"],
+            "legend.labelcolor": PALETTE["fg"],
+            "font.family": "sans-serif",
+            "font.size": 10,
+        }
+    )
 
 
 # â”€â”€ Fractional Brownian Motion â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
 
 class FractionalBrownianMotion:
     """
@@ -86,10 +90,10 @@ class FractionalBrownianMotion:
         self.nWalks = nWalks
         self.hurstExponents = hurstExponents if hurstExponents is not None else [0.3, 0.5, 0.7, 0.9]
         self.rng = rng if rng is not None else np.random.default_rng(42)
-        self.trajectories = {}         # H -> ndarray (nWalks, nSteps+1)
-        self.msd = {}                  # H -> ndarray (maxLag,)
+        self.trajectories = {}  # H -> ndarray (nWalks, nSteps+1)
+        self.msd = {}  # H -> ndarray (maxLag,)
         self.lagTimes = None
-        self.diffusionExponents = {}   # H -> float, fitted slope of log MSD vs log tau
+        self.diffusionExponents = {}  # H -> float, fitted slope of log MSD vs log tau
 
     def _fractionalGaussianNoise(self, n, H, seed):
         """
@@ -100,15 +104,13 @@ class FractionalBrownianMotion:
         localRng = np.random.default_rng(seed)
         k = np.arange(n)
         gamma = 0.5 * (
-            np.abs(k + 1) ** (2 * H)
-            - 2 * np.abs(k) ** (2 * H)
-            + np.abs(k - 1) ** (2 * H)
+            np.abs(k + 1) ** (2 * H) - 2 * np.abs(k) ** (2 * H) + np.abs(k - 1) ** (2 * H)
         )
         # Circulant embedding of size 2n:  [gamma_0, gamma_1, ..., gamma_{n-1}, gamma_{n-1}, ..., gamma_1]
-        row = np.concatenate([gamma, gamma[n - 1:0:-1]])
+        row = np.concatenate([gamma, gamma[n - 1 : 0 : -1]])
         m = len(row)  # should be 2n
         eigVals = np.real(np.fft.fft(row))
-        eigVals = np.maximum(eigVals, 0.0)   # numerical floor
+        eigVals = np.maximum(eigVals, 0.0)  # numerical floor
         phi = localRng.standard_normal(m) + 1j * localRng.standard_normal(m)
         fgnFull = np.real(np.fft.ifft(np.sqrt(eigVals) * phi)) * np.sqrt(m)
         return fgnFull[:n]
@@ -136,10 +138,9 @@ class FractionalBrownianMotion:
         self.lagTimes = np.arange(1, maxLag + 1)
         for H in self.hurstExponents:
             traj = self.trajectories[H]
-            self.msd[H] = np.array([
-                np.mean((traj[:, lag:] - traj[:, :-lag]) ** 2)
-                for lag in self.lagTimes
-            ])
+            self.msd[H] = np.array(
+                [np.mean((traj[:, lag:] - traj[:, :-lag]) ** 2) for lag in self.lagTimes]
+            )
         return self
 
     def fitExponents(self):
@@ -154,6 +155,7 @@ class FractionalBrownianMotion:
 
 
 # â”€â”€ Levy Flight â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
 
 class LevyFlight:
     """
@@ -181,7 +183,7 @@ class LevyFlight:
         self.nWalks = nWalks
         self.alphaValues = alphaValues if alphaValues is not None else [1.2, 1.6, 2.0]
         self.rng = rng if rng is not None else np.random.default_rng(42)
-        self.trajectories = {}   # alpha -> ndarray (nWalks, nSteps+1, 2)
+        self.trajectories = {}  # alpha -> ndarray (nWalks, nSteps+1, 2)
 
     def generate(self):
         """Generate 2D Levy flight trajectories for all configured alpha values."""
@@ -192,10 +194,14 @@ class LevyFlight:
                 if alpha < 2.0:
                     # Isotropic 2D: random direction + Levy-stable magnitude
                     angles = self.rng.uniform(0, 2 * np.pi, self.nSteps)
-                    magnitudes = np.abs(levy_stable.rvs(
-                        alpha=alpha, beta=0, size=self.nSteps,
-                        random_state=int(walkIdx * 13 + 7)
-                    ))
+                    magnitudes = np.abs(
+                        levy_stable.rvs(
+                            alpha=alpha,
+                            beta=0,
+                            size=self.nSteps,
+                            random_state=int(walkIdx * 13 + 7),
+                        )
+                    )
                     stepsX = magnitudes * np.cos(angles)
                     stepsY = magnitudes * np.sin(angles)
                 else:
@@ -208,6 +214,7 @@ class LevyFlight:
 
 
 # â”€â”€ Ornstein-Uhlenbeck Process â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
 
 class OrnsteinUhlenbeck:
     """
@@ -240,8 +247,7 @@ class OrnsteinUhlenbeck:
     rng    : numpy Generator (optional)
     """
 
-    def __init__(self, nSteps=5000, nWalks=200, mu=0.0, theta=0.05,
-                 sigma=1.0, dt=1.0, rng=None):
+    def __init__(self, nSteps=5000, nWalks=200, mu=0.0, theta=0.05, sigma=1.0, dt=1.0, rng=None):
         self.nSteps = nSteps
         self.nWalks = nWalks
         self.mu = mu
@@ -249,11 +255,11 @@ class OrnsteinUhlenbeck:
         self.sigma = sigma
         self.dt = dt
         self.rng = rng if rng is not None else np.random.default_rng(42)
-        self.trajectories = None   # ndarray (nWalks, nSteps+1)
+        self.trajectories = None  # ndarray (nWalks, nSteps+1)
 
     def stationaryVariance(self):
         """Analytical long-time variance: sigma^2 / (2 * theta)."""
-        return self.sigma ** 2 / (2 * self.theta)
+        return self.sigma**2 / (2 * self.theta)
 
     def analyticalVariance(self, t):
         """
@@ -280,6 +286,7 @@ class OrnsteinUhlenbeck:
 
 
 # â”€â”€ Visualizer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
 
 class DiffusionVisualizer:
     """
@@ -314,8 +321,13 @@ class DiffusionVisualizer:
         ax.set_title("Trajectories for Different Hurst Exponents")
         for H, col in zip(fbm.hurstExponents, colors):
             alpha_d = fbm.diffusionExponents.get(H, 2 * H)
-            ax.plot(tPlot, fbm.trajectories[H][0], color=col, linewidth=0.8,
-                    label=f"H = {H:.1f}  ($\\alpha_{{\\rm diff}} \\approx {alpha_d:.2f}$)")
+            ax.plot(
+                tPlot,
+                fbm.trajectories[H][0],
+                color=col,
+                linewidth=0.8,
+                label=f"H = {H:.1f}  ($\\alpha_{{\\rm diff}} \\approx {alpha_d:.2f}$)",
+            )
         ax.set_xlabel("Time Step")
         ax.set_ylabel("Position")
         ax.legend(fontsize=9)
@@ -326,8 +338,14 @@ class DiffusionVisualizer:
         for H, col in zip(fbm.hurstExponents, colors):
             ax.loglog(fbm.lagTimes, fbm.msd[H], color=col, linewidth=2, label=f"H = {H:.1f}")
             prefac = fbm.msd[H][0] / fbm.lagTimes[0] ** (2 * H)
-            ax.loglog(fbm.lagTimes, prefac * fbm.lagTimes ** (2 * H),
-                      color=col, linewidth=1, linestyle="--", alpha=0.5)
+            ax.loglog(
+                fbm.lagTimes,
+                prefac * fbm.lagTimes ** (2 * H),
+                color=col,
+                linewidth=1,
+                linestyle="--",
+                alpha=0.5,
+            )
         ax.set_xlabel(r"Lag Time $\tau$")
         ax.set_ylabel(r"MSD $\langle\Delta x^2(\tau)\rangle$")
         ax.legend(fontsize=9)
@@ -353,8 +371,13 @@ class DiffusionVisualizer:
                 x, y = traj[w, :, 0], traj[w, :, 1]
                 for seg in range(0, levy.nSteps, 50):
                     segColor = plt.cm.plasma(norm(seg))
-                    ax.plot(x[seg:seg + 51], y[seg:seg + 51],
-                            color=segColor, linewidth=0.6, alpha=0.8)
+                    ax.plot(
+                        x[seg : seg + 51],
+                        y[seg : seg + 51],
+                        color=segColor,
+                        linewidth=0.6,
+                        alpha=0.8,
+                    )
                 ax.plot(x[0], y[0], "o", color=p["green"], markersize=5, zorder=5)
                 ax.plot(x[-1], y[-1], "x", color=p["red"], markersize=7, zorder=5)
             ax.set_title(f"$\\alpha = {alpha:.1f}$", fontsize=13)
@@ -388,10 +411,15 @@ class DiffusionVisualizer:
         ax.set_title("Sample Trajectories")
         for w in range(8):
             ax.plot(tArr, ou.trajectories[w], linewidth=0.7, alpha=0.8)
-        ax.axhline(ou.mu, color=p["red"], linewidth=1.5, linestyle="--",
-                   label=f"$\\mu = {ou.mu}$")
-        ax.fill_between(tArr, ou.mu - varInf ** 0.5, ou.mu + varInf ** 0.5,
-                        alpha=0.15, color=p["yellow"], label=r"$\pm\sigma_\infty$")
+        ax.axhline(ou.mu, color=p["red"], linewidth=1.5, linestyle="--", label=f"$\\mu = {ou.mu}$")
+        ax.fill_between(
+            tArr,
+            ou.mu - varInf**0.5,
+            ou.mu + varInf**0.5,
+            alpha=0.15,
+            color=p["yellow"],
+            label=r"$\pm\sigma_\infty$",
+        )
         ax.set_xlabel("Time")
         ax.set_ylabel("X(t)")
         ax.legend(fontsize=9)
@@ -402,9 +430,13 @@ class DiffusionVisualizer:
         finalVals = ou.trajectories[:, -1]
         ax.hist(finalVals, bins=30, density=True, color=p["blue"], alpha=0.7, label="Simulated")
         xG = np.linspace(finalVals.min() - 0.5, finalVals.max() + 0.5, 300)
-        ax.plot(xG, scipy_norm.pdf(xG, ou.mu, varInf ** 0.5),
-                color=p["orange"], linewidth=2.5,
-                label=f"$\\mathcal{{N}}(\\mu,\\,\\sigma^2={varInf:.1f})$")
+        ax.plot(
+            xG,
+            scipy_norm.pdf(xG, ou.mu, varInf**0.5),
+            color=p["orange"],
+            linewidth=2.5,
+            label=f"$\\mathcal{{N}}(\\mu,\\,\\sigma^2={varInf:.1f})$",
+        )
         ax.set_xlabel("X")
         ax.set_ylabel("Density")
         ax.legend(fontsize=9)
@@ -414,10 +446,21 @@ class DiffusionVisualizer:
         ax.set_title("Variance Relaxation to Stationary Value")
         varSim = np.var(ou.trajectories, axis=0)
         ax.plot(tArr, varSim, color=p["cyan"], linewidth=2, label="Simulated Var(t)")
-        ax.plot(tArr, ou.analyticalVariance(tArr),
-                color=p["yellow"], linewidth=2, linestyle="--", label="Analytical Var(t)")
-        ax.axhline(varInf, color=p["red"], linewidth=1, linestyle=":",
-                   label=f"$\\sigma^2_\\infty = {varInf:.1f}$")
+        ax.plot(
+            tArr,
+            ou.analyticalVariance(tArr),
+            color=p["yellow"],
+            linewidth=2,
+            linestyle="--",
+            label="Analytical Var(t)",
+        )
+        ax.axhline(
+            varInf,
+            color=p["red"],
+            linewidth=1,
+            linestyle=":",
+            label=f"$\\sigma^2_\\infty = {varInf:.1f}$",
+        )
         ax.set_xlabel("Time")
         ax.set_ylabel("Variance")
         ax.legend(fontsize=9)
@@ -439,26 +482,50 @@ class DiffusionVisualizer:
         fig.suptitle("Mean Squared Displacement: Diffusion Regimes", fontsize=15)
 
         for H, col in zip(fbm.hurstExponents, colors):
-            ax.loglog(lagTimes, fbm.msd[H], color=col, linewidth=2.5,
-                      label=f"fBm H={H:.1f} ($\\alpha={2 * H:.1f}$)")
+            ax.loglog(
+                lagTimes,
+                fbm.msd[H],
+                color=col,
+                linewidth=2.5,
+                label=f"fBm H={H:.1f} ($\\alpha={2 * H:.1f}$)",
+            )
 
-        levyMSD = np.array([
-            np.mean((levy.trajectories[2.0][:, lag, 0] - levy.trajectories[2.0][:, 0, 0]) ** 2)
-            for lag in lagTimes
-        ])
-        ax.loglog(lagTimes, levyMSD, color=p["orange"], linewidth=2,
-                  linestyle="-.", label=r"L\'evy $\alpha=2.0$ (Gaussian)")
+        levyMSD = np.array(
+            [
+                np.mean((levy.trajectories[2.0][:, lag, 0] - levy.trajectories[2.0][:, 0, 0]) ** 2)
+                for lag in lagTimes
+            ]
+        )
+        ax.loglog(
+            lagTimes,
+            levyMSD,
+            color=p["orange"],
+            linewidth=2,
+            linestyle="-.",
+            label=r"L\'evy $\alpha=2.0$ (Gaussian)",
+        )
 
-        ouMSD = np.array([
-            np.mean((ou.trajectories[:, lag] - ou.trajectories[:, 0]) ** 2)
-            for lag in lagTimes
-        ])
-        ax.loglog(lagTimes, ouMSD, color=p["purple"], linewidth=2,
-                  linestyle="--", label="Ornstein-Uhlenbeck (bounded)")
+        ouMSD = np.array(
+            [np.mean((ou.trajectories[:, lag] - ou.trajectories[:, 0]) ** 2) for lag in lagTimes]
+        )
+        ax.loglog(
+            lagTimes,
+            ouMSD,
+            color=p["purple"],
+            linewidth=2,
+            linestyle="--",
+            label="Ornstein-Uhlenbeck (bounded)",
+        )
 
-        ax.loglog(lagTimes.astype(float), 2.0 * lagTimes.astype(float),
-                  color=p["subtle"], linewidth=1.2, linestyle=":", alpha=0.6,
-                  label="Normal diffusion (slope = 1)")
+        ax.loglog(
+            lagTimes.astype(float),
+            2.0 * lagTimes.astype(float),
+            color=p["subtle"],
+            linewidth=1.2,
+            linestyle=":",
+            alpha=0.6,
+            label="Normal diffusion (slope = 1)",
+        )
 
         ax.set_xlabel(r"Lag Time $\tau$")
         ax.set_ylabel(r"MSD $\langle\Delta x^2\rangle$")
@@ -482,22 +549,28 @@ if __name__ == "__main__":
     plotsDir = os.path.join(scriptDir, "Plots")
 
     fbm = FractionalBrownianMotion(
-        nSteps=5000, nWalks=200,
+        nSteps=5000,
+        nWalks=200,
         hurstExponents=[0.3, 0.5, 0.7, 0.9],
         rng=np.random.default_rng(42),
     )
     fbm.generate().computeMSD(maxLag=500).fitExponents()
 
     levy = LevyFlight(
-        nSteps=5000, nWalks=200,
+        nSteps=5000,
+        nWalks=200,
         alphaValues=[1.2, 1.6, 2.0],
         rng=np.random.default_rng(43),
     )
     levy.generate()
 
     ou = OrnsteinUhlenbeck(
-        nSteps=5000, nWalks=200,
-        mu=0.0, theta=0.05, sigma=1.0, dt=1.0,
+        nSteps=5000,
+        nWalks=200,
+        mu=0.0,
+        theta=0.05,
+        sigma=1.0,
+        dt=1.0,
         rng=np.random.default_rng(44),
     )
     ou.generate()
@@ -513,5 +586,3 @@ if __name__ == "__main__":
     viz.plotMSDComparison(fbm, levy, ou)
 
     print("Done.")
-
-

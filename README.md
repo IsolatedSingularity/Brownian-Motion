@@ -1,10 +1,14 @@
 # Brownian Motion
 
 [![CI](https://img.shields.io/github/actions/workflow/status/IsolatedSingularity/Brownian-Motion/ci.yml?branch=main&label=CI&logo=github)](https://github.com/IsolatedSingularity/Brownian-Motion/actions/workflows/ci.yml)
-[![Python](https://img.shields.io/badge/python-3.10%2B-3776AB.svg?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![NumPy](https://img.shields.io/badge/numpy-darkblue.svg?style=for-the-badge&logo=numpy&logoColor=white)](https://numpy.org/)
-[![SciPy](https://img.shields.io/badge/scipy-8CAAE6.svg?style=for-the-badge&logo=scipy&logoColor=white)](https://scipy.org/)
-[![Matplotlib](https://img.shields.io/badge/matplotlib-11557C.svg?style=for-the-badge)](https://matplotlib.org/)
+[![Python](https://img.shields.io/badge/python-3.10%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![NumPy](https://img.shields.io/badge/numpy-darkblue.svg?logo=numpy&logoColor=white)](https://numpy.org/)
+[![SciPy](https://img.shields.io/badge/scipy-8CAAE6.svg?logo=scipy&logoColor=white)](https://scipy.org/)
+[![Matplotlib](https://img.shields.io/badge/matplotlib-11557C.svg)](https://matplotlib.org/)
+
+<p align="center">
+  <img src="Plots/levy_flights_hero.jpg" alt="Lévy flight in 2D" width="700">
+</p>
 
 Two complementary scripts exploring random walks and their generalizations, from the textbook 1D random walk to the menagerie of anomalous diffusion processes found in physics, biology, and finance.
 
