@@ -65,33 +65,65 @@ Output figures (saved to `Plots/`):
 
 ## Theory
 
-### Standard Brownian Motion
+### From discrete random walks to the Wiener process
 
-For a walker taking steps of size $\pm 1$ with equal probability, the central limit theorem gives $x_\text{RMS}(t) = \sqrt{2Dt}$ with diffusion constant $D = \sigma^2 / 2$ where $\sigma^2$ is the step-size variance.
+Consider a walker on the real line taking steps $\{\xi_i\}_{i=1}^{N}$ drawn i.i.d. from a distribution with mean zero, finite variance $\sigma^2$, and arbitrary higher moments. The displacement after $N$ steps is
 
-### Anomalous Diffusion
+$$X_N \;=\; \sum_{i=1}^{N} \xi_i,$$
 
-The generalized MSD scaling $\langle \Delta x^2 \rangle \sim t^\alpha$ classifies diffusion regimes:
+with mean $\langle X_N \rangle = 0$ and variance $\langle X_N^2 \rangle = N\sigma^2$. The classical central limit theorem guarantees that the rescaled sum $X_N / \sqrt{N}$ converges weakly to a Gaussian, so in the diffusive scaling $t = N\Delta t,\; x = X_N\sqrt{\Delta t}$ the walker's position becomes a Wiener process $W(t)$ in the limit $N \to \infty,\, \Delta t \to 0$ with $D \equiv \sigma^2/(2\Delta t)$ held fixed. The probability density $\rho(x, t)$ satisfies the diffusion equation
 
-$$\alpha < 1: \text{ subdiffusion} \quad \alpha = 1: \text{ normal} \quad \alpha > 1: \text{ superdiffusion}$$
+$$\partial_t \rho \;=\; D\,\partial_x^2 \rho, \qquad \rho(x,0) = \delta(x),$$
 
-For fBm with Hurst exponent $H$, $\alpha = 2H$. The autocovariance of the increments (fractional Gaussian noise) is:
+whose fundamental solution is the heat kernel $\rho(x,t) = (4\pi D t)^{-1/2}\exp(-x^2/4Dt)$, yielding the canonical scaling $\langle x^2(t)\rangle = 2Dt$. The first script in this repository fits this law (and a power-law generalisation) to the simulated trajectory of a mixed-step walker; deviations of the fitted exponent from $1/2$ flag departures from the Gaussian universality class.
 
-$$\gamma(k) = \tfrac{1}{2}\bigl(|k+1|^{2H} - 2|k|^{2H} + |k-1|^{2H}\bigr)$$
+### Anomalous diffusion and fractional Brownian motion
 
-which is negative for $H < 0.5$ (anti-persistent, subdiffusive) and positive for $H > 0.5$ (persistent, superdiffusive).
+The Gaussian universality class is fragile. Whenever step correlations decay too slowly, or step variance diverges, the linear-in-time MSD law breaks. We summarise the resulting regimes by the scaling
 
-### Lévy Flights
+$$\bigl\langle [x(t) - x(0)]^2 \bigr\rangle \;\sim\; t^{\alpha}, \qquad \alpha \in (0, 2],$$
 
-For step-size distributions with power-law tails $P(x) \sim |x|^{-(1+\alpha)}$, $\alpha \in (0, 2)$, the variance diverges and the central limit theorem is replaced by the generalized stable-law limit theorem. The characteristic function is $\hat{P}(k) = e^{-|k|^\alpha}$.
+with $\alpha < 1$ subdiffusion (trapping, viscoelastic media), $\alpha = 1$ ordinary diffusion, and $\alpha > 1$ superdiffusion (long flights, active transport). A clean parametric family realising every $\alpha \in (0, 2)$ is fractional Brownian motion $B_H(t)$, the unique zero-mean Gaussian process with stationary increments and the covariance
 
-### Ornstein-Uhlenbeck Process
+$$\bigl\langle B_H(t)\, B_H(s)\bigr\rangle \;=\; \tfrac{1}{2}\bigl(|t|^{2H} + |s|^{2H} - |t - s|^{2H}\bigr), \qquad H \in (0, 1),$$
 
-The OU process solves the Langevin equation:
+so that $\langle B_H(t)^2\rangle = t^{2H}$ and consequently $\alpha = 2H$. Differencing on a unit lattice produces fractional Gaussian noise with autocovariance
 
-$$dX = -\theta(X - \mu)\,dt + \sigma\,dW$$
+$$\gamma(k) \;=\; \tfrac{1}{2}\bigl(|k+1|^{2H} - 2|k|^{2H} + |k-1|^{2H}\bigr),$$
 
-yielding a Gaussian stationary distribution $\mathcal{N}(\mu,\, \sigma^2/2\theta)$. Unlike free Brownian motion, the variance saturates rather than growing without bound, making OU a canonical model for mean-reverting fluctuations (interest rates, velocity in a fluid, thermal noise in a harmonic trap).
+negative for $H < 1/2$ (anti-persistent, locally reversing), zero for $H = 1/2$ (independent Wiener increments), and positive with the slow $k^{2H-2}$ tail for $H > 1/2$ (long-range dependence). We synthesise exact sample paths via the Davies-Harte circulant embedding: the symmetric Toeplitz covariance matrix is diagonalised by the discrete Fourier transform, allowing $\mathcal{O}(N \log N)$ generation of length-$N$ trajectories with the prescribed spectrum.
+
+### Heavy-tailed steps and the generalised central limit theorem
+
+Even when increments are independent, finite variance is essential to the Gaussian limit; relaxing it leads to the second universality class. If step sizes are drawn from a symmetric distribution with the asymptotic tail
+
+$$P(|\xi| > x) \;\sim\; C\, x^{-\alpha}, \qquad 0 < \alpha < 2,$$
+
+the variance diverges and the classical central limit theorem fails. The Gnedenko-Kolmogorov generalised central limit theorem guarantees instead that suitably normalised sums $X_N / N^{1/\alpha}$ converge to a symmetric $\alpha$-stable random variable $S_\alpha$ with characteristic function
+
+$$\mathbb{E}\bigl[e^{ikS_\alpha}\bigr] \;=\; \exp(-c|k|^{\alpha}),$$
+
+reducing to the Gaussian case at $\alpha = 2$ and to the Cauchy distribution at $\alpha = 1$. The corresponding continuous-time process is a Lévy flight: trajectories are dominated by rare large jumps, the spatial density develops algebraic tails $\rho(x, t) \sim t / |x|^{1+\alpha}$, and the MSD is formally infinite for $\alpha < 2$ even though pseudo-MSDs computed from finite samples appear to scale superdiffusively as $\sim t^{2/\alpha}$. The hero figure shows three trajectories at $\alpha = 2.0$, the boundary case where the stable law collapses back onto the Wiener process; smaller $\alpha$ values produce the characteristic clusters-and-jumps morphology that distinguishes Lévy transport from ordinary diffusion in foraging ecology, plasma turbulence, and disordered solids.
+
+### Confined diffusion: the Ornstein-Uhlenbeck process
+
+The two preceding regimes share unbounded growth of the position; many physical settings instead constrain the walker through a restoring force. The minimal model is the overdamped Langevin equation
+
+$$dX_t \;=\; -\theta\,(X_t - \mu)\,dt \;+\; \sigma\, dW_t,$$
+
+with mean-reversion rate $\theta > 0$, equilibrium $\mu$, and diffusion amplitude $\sigma$. The associated Fokker-Planck equation
+
+$$\partial_t \rho \;=\; \theta\,\partial_x\bigl[(x - \mu)\rho\bigr] \;+\; \tfrac{\sigma^2}{2}\,\partial_x^2 \rho$$
+
+admits the closed-form transition density (Mehler kernel)
+
+$$\rho(x, t \,|\, x_0, 0) \;=\; \mathcal{N}\!\left(\mu + (x_0 - \mu) e^{-\theta t},\;\; \frac{\sigma^2}{2\theta}\bigl(1 - e^{-2\theta t}\bigr)\right),$$
+
+whose stationary limit is the Boltzmann-Gibbs distribution $\mathcal{N}(\mu, \sigma^2/2\theta)$ for a harmonic potential $V(x) = \tfrac{1}{2}\theta(x - \mu)^2$ at temperature $k_B T = \sigma^2/2$ (fluctuation-dissipation). On timescales $t \ll \theta^{-1}$ the process is indistinguishable from free Brownian motion with diffusion constant $D = \sigma^2/2$; on timescales $t \gg \theta^{-1}$ the variance saturates at $\sigma^2/2\theta$ and the autocovariance decays as $\langle X_t X_0\rangle - \mu^2 = (\sigma^2/2\theta)\, e^{-\theta t}$. We integrate the SDE with the exact discretisation that samples directly from the Mehler kernel rather than the first-order Euler-Maruyama scheme, eliminating discretisation bias regardless of step size.
+
+### Synthesis
+
+The four processes simulated here trace the boundary of the Wiener universality class in two orthogonal directions: temporal correlations (fBm) and step-size tails (Lévy flights), with the Ornstein-Uhlenbeck process furnishing the bounded counterpoint. The unified MSD comparison plot shows all three departures from the linear law on a single log-log axis, making the geometric origin of $\alpha = 2H$, $\alpha = 2/\alpha_\text{stable}$, and the OU plateau visible at a glance.
 
 ---
 
