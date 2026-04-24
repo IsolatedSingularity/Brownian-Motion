@@ -1,6 +1,7 @@
 # Brownian Motion
 
-[![Python](https://img.shields.io/badge/python-3.8%2B-3776AB.svg?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![CI](https://img.shields.io/github/actions/workflow/status/IsolatedSingularity/Brownian-Motion/ci.yml?branch=main&label=CI&logo=github)](https://github.com/IsolatedSingularity/Brownian-Motion/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-3.10%2B-3776AB.svg?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![NumPy](https://img.shields.io/badge/numpy-darkblue.svg?style=for-the-badge&logo=numpy&logoColor=white)](https://numpy.org/)
 [![SciPy](https://img.shields.io/badge/scipy-8CAAE6.svg?style=for-the-badge&logo=scipy&logoColor=white)](https://scipy.org/)
 [![Matplotlib](https://img.shields.io/badge/matplotlib-11557C.svg?style=for-the-badge)](https://matplotlib.org/)
@@ -39,6 +40,22 @@ Output figures (saved to `Plots/`):
 - `levy_flights_2d.jpg`: 2D Lévy flight paths colored by step progression, three stability indices
 - `ornstein_uhlenbeck.jpg`: OU sample paths, stationary Gaussian distribution, variance relaxation
 - `msd_comparison.jpg`: unified log-log MSD comparison across all regimes
+
+<p align="center">
+  <img src="Plots/fBm_anomalous_diffusion.jpg" alt="fBm trajectories and MSD scaling" width="900">
+</p>
+
+<p align="center">
+  <img src="Plots/levy_flights_2d.jpg" alt="Lévy flights in 2D" width="900">
+</p>
+
+<p align="center">
+  <img src="Plots/ornstein_uhlenbeck.jpg" alt="Ornstein-Uhlenbeck process" width="900">
+</p>
+
+<p align="center">
+  <img src="Plots/msd_comparison.jpg" alt="MSD comparison across diffusion regimes" width="700">
+</p>
 
 ---
 
