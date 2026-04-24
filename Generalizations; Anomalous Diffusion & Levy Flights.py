@@ -395,6 +395,13 @@ class DiffusionVisualizer:
         path = self._savePath("levy_flights_2d.jpg")
         fig.savefig(path, bbox_inches="tight", dpi=300)
         print(f"  saved {path}")
+
+        # Hero: full 3-panel figure without colorbar
+        cbar.remove()
+        heroPath = self._savePath("levy_flights_hero.jpg")
+        fig.savefig(heroPath, bbox_inches="tight", dpi=300)
+        print(f"  saved {heroPath}")
+
         plt.close(fig)
 
     def plotOU(self, ou):
