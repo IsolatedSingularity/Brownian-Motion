@@ -395,14 +395,34 @@ class DiffusionVisualizer:
         path = self._savePath("levy_flights_2d.jpg")
         fig.savefig(path, bbox_inches="tight", dpi=300)
         print(f"  saved {path}")
-
-        # Hero: full 3-panel figure without colorbar
-        cbar.remove()
-        heroPath = self._savePath("levy_flights_hero.jpg")
-        fig.savefig(heroPath, bbox_inches="tight", dpi=300)
-        print(f"  saved {heroPath}")
-
         plt.close(fig)
+
+        # Hero: third subplot only (highest alpha), axes + title, no colorbar
+        alpha3 = levy.alphaValues[2]
+        traj3 = levy.trajectories[alpha3]
+        norm3 = Normalize(vmin=0, vmax=levy.nSteps)
+        figH, axH = plt.subplots(figsize=(6, 6))
+        for w in range(5):
+            x, y = traj3[w, :, 0], traj3[w, :, 1]
+            for seg in range(0, levy.nSteps, 50):
+                axH.plot(
+                    x[seg : seg + 51],
+                    y[seg : seg + 51],
+                    color=plt.cm.plasma(norm3(seg)),
+                    linewidth=0.6,
+                    alpha=0.8,
+                )
+            axH.plot(x[0], y[0], "o", color=p["green"], markersize=5, zorder=5)
+            axH.plot(x[-1], y[-1], "x", color=p["red"], markersize=7, zorder=5)
+        axH.set_title(f"$\\alpha = {alpha3:.1f}$ — Lévy Flight", fontsize=13)
+        axH.set_xlabel("x")
+        axH.set_ylabel("y")
+        axH.set_aspect("equal", adjustable="box")
+        axH.grid(True)
+        heroPath = self._savePath("levy_flights_hero.jpg")
+        figH.savefig(heroPath, bbox_inches="tight", dpi=300)
+        print(f"  saved {heroPath}")
+        plt.close(figH)
 
     def plotOU(self, ou):
         """Figure 3: OU sample paths, stationary distribution, variance relaxation."""
