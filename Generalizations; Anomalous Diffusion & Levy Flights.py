@@ -360,7 +360,7 @@ class DiffusionVisualizer:
     def plotLevy(self, levy):
         """Figure 2: 2D Levy flight paths coloured by step progression."""
         p = self.palette
-        fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+        fig, axes = plt.subplots(1, 3, figsize=(18, 6), constrained_layout=True)
         fig.suptitle(r"L\'evy Flights in 2D: Heavy-Tailed Step Distributions", fontsize=15)
         levyColors = [p["cyan"], p["purple"], p["orange"]]
 
@@ -388,11 +388,10 @@ class DiffusionVisualizer:
 
         sm = ScalarMappable(cmap="plasma", norm=Normalize(0, levy.nSteps))
         sm.set_array([])
-        cbar = fig.colorbar(sm, ax=axes.ravel().tolist(), fraction=0.015, pad=0.04)
+        cbar = fig.colorbar(sm, ax=axes.ravel().tolist(), fraction=0.025, pad=0.04)
         cbar.set_label("Step")
         cbar.ax.yaxis.set_tick_params(color=p["muted"])
 
-        fig.tight_layout()
         path = self._savePath("levy_flights_2d.jpg")
         fig.savefig(path, bbox_inches="tight", dpi=300)
         print(f"  saved {path}")
