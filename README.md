@@ -91,7 +91,7 @@ so that $\langle B_H(t)^2\rangle = t^{2H}$ and consequently $\alpha = 2H$. Diffe
 
 $$\gamma(k) \;=\; \tfrac{1}{2}\bigl(|k+1|^{2H} - 2|k|^{2H} + |k-1|^{2H}\bigr),$$
 
-negative for $H < 1/2$ (anti-persistent, locally reversing), zero for $H = 1/2$ (independent Wiener increments), and positive with the slow $k^{2H-2}$ tail for $H > 1/2$ (long-range dependence). We synthesise exact sample paths via the Davies-Harte circulant embedding: the symmetric Toeplitz covariance matrix is diagonalised by the discrete Fourier transform, allowing $\mathcal{O}(N \log N)$ generation of length-$N$ trajectories with the prescribed spectrum.
+negative for $H < 1/2$ (anti-persistent, locally reversing), zero for $H = 1/2$ (independent Wiener increments), and positive with the slow $k^{2H-2}$ tail for $H > 1/2$ (long-range dependence). We synthesise exact sample paths via the Davies-Harte circulant embedding: the symmetric Toeplitz covariance matrix is diagonalised by the discrete Fourier transform, allowing $\mathcal{O}(N \log N)$ generation of trajectories of length $N$ with the prescribed spectrum.
 
 ### Heavy-tailed steps and the generalised central limit theorem
 

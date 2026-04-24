@@ -414,7 +414,7 @@ class DiffusionVisualizer:
                 )
             axH.plot(x[0], y[0], "o", color=p["green"], markersize=5, zorder=5)
             axH.plot(x[-1], y[-1], "x", color=p["red"], markersize=7, zorder=5)
-        axH.set_title(f"Heavy-Tailed Random Walk ($\\alpha = {alpha3:.1f}$)", fontsize=13)
+        axH.set_title(f"$\\alpha = {alpha3:.1f}$", fontsize=13)
         axH.set_xlabel("x")
         axH.set_ylabel("y")
         axH.set_aspect("equal", adjustable="box")
